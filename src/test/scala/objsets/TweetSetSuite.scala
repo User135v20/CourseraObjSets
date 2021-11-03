@@ -10,6 +10,13 @@ class TweetSetSuite extends munit.FunSuite {
     val set4c = set3.incl(c)
     val set4d = set3.incl(d)
     val set5 = set4c.incl(d)
+
+    val set11 = new Empty
+    val set12 = set11.incl(new Tweet("aa", "aa body", 1))
+    val set13 = set12.incl(new Tweet("bb", "bb body", 2))
+    val set14 = set13.incl(new Tweet("cc", "cc body", 20))
+    val set15 = set14.incl(new Tweet("dd", "dd body", 30))
+    val set16 = set15.incl(new Tweet("ee", "ee body", 4))
   }
 
   def asSet(tweets: TweetSet): Set[Tweet] = {
@@ -56,6 +63,12 @@ class TweetSetSuite extends munit.FunSuite {
     }
   }
 
+  test("union: set5 and set 13") {
+    new TestSets {
+      assertEquals(size(set13.union(set5)), 6)
+    }
+  }
+
 
   test("most retweeted set4c") {
     new TestSets {
@@ -63,13 +76,19 @@ class TweetSetSuite extends munit.FunSuite {
     }
   }
 
-/*  test("descending: set5") {
+  test("Tweet List set4c") {
+    new TestSets {
+      assertEquals(set16.descendingByRetweet.tail.head.retweets, 20)
+    }
+  }
+
+  test("descending: set5") {
     new TestSets {
       val trends = set5.descendingByRetweet
       assert(!trends.isEmpty)
       assert(trends.head.user == "a" || trends.head.user == "b")
     }
-  }*/
+  }
 
 
   import scala.concurrent.duration._

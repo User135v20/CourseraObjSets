@@ -116,7 +116,7 @@ class Empty extends TweetSet {
 
   def mostRetweeted: Tweet = throw new java.util.NoSuchElementException
 
-  def descendingByRetweet: TweetList = ???
+  def descendingByRetweet: TweetList = Nil
 
   /**
    * The following methods are already implemented
@@ -135,9 +135,10 @@ class Empty extends TweetSet {
 class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
 
   def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = {
+
     elem match{
-      case x if p(x) => right.filterAcc(p, acc.incl(x))
-      case _ => right.filterAcc(p, acc)
+      case x if p(x) => right.filterAcc(p, acc.incl(x)).union(left.filterAcc(p, acc.incl(x)))
+      case _ => right.filterAcc(p, acc).union(left.filterAcc(p, acc))
     }
   }
 
@@ -175,24 +176,15 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
     }*/
    // viewingTweets(right,elem)
 
-
   def descendingByRetweet: TweetList = {
 
-    def iterMostRetw():List[Tweet] = {
-
-
+    def tailList (tweetSet: TweetSet): TweetList = {
+      tweetSet match {
+        case nonEmpty: NonEmpty => new Cons(tweetSet.mostRetweeted, tailList(tweetSet.remove(tweetSet.mostRetweeted)))
+        case _ => Nil
+      }
     }
-
-
-
-    new TweetList {
-      override def head: Tweet = ???
-
-      override def tail: TweetList = ???
-
-      override def isEmpty: Boolean = false
-    }
-
+    new Cons(this.mostRetweeted, tailList(this.remove(this.mostRetweeted)))
   }
 
 
@@ -249,14 +241,22 @@ object GoogleVsApple {
   val google = List("android", "Android", "galaxy", "Galaxy", "nexus", "Nexus")
   val apple = List("ios", "iOS", "iphone", "iPhone", "ipad", "iPad")
 
-  lazy val googleTweets: TweetSet = ???
-  lazy val appleTweets: TweetSet = ???
+  def SetBySearchWords(list: List[String], tweetSet: TweetSet) : TweetSet ={
+    list match {
+      case x if x.isEmpty => tweetSet
+      case _ =>  SetBySearchWords(list.tail, tweetSet.union(allTweets.filter(x => x.text.contains(list.head))))
+    }
+  }
+
+
+  lazy val googleTweets: TweetSet =  SetBySearchWords(google, new Empty) //google.foreach(substring => allTweets.filter(x => x.text.contains(substring)))
+  lazy val appleTweets: TweetSet = SetBySearchWords(apple, new Empty) //apple.foreach(x => ParseTweets.getTweets(_,x))
 
   /**
    * A list of all tweets mentioning a keyword from either apple or google,
    * sorted by the number of retweets.
    */
-  lazy val trending: TweetList = ???
+  lazy val trending: TweetList = googleTweets.union(appleTweets).descendingByRetweet
 }
 
 object Main extends App {
