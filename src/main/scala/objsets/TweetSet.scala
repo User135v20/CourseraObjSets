@@ -8,7 +8,7 @@ import TweetReader._
 class Tweet(val user: String, val text: String, val retweets: Int) {
   override def toString: String =
     "User: " + user + "\n" +
-    "Text: " + text + " [" + retweets + "]"
+      "Text: " + text + " [" + retweets + "]"
 }
 
 /**
@@ -60,14 +60,14 @@ abstract class TweetSet extends TweetSetInterface {
   def union(that: TweetSet): TweetSet
 
   /**
-     * Returns the tweet from this set which has the greatest retweet count.
-     *
-     * Calling `mostRetweeted` on an empty set should throw an exception of
-     * type `java.util.NoSuchElementException`.
-     *
-     * Question: Should we implment this method here, or should it remain abstract
-     * and be implemented in the subclasses?
-     */
+   * Returns the tweet from this set which has the greatest retweet count.
+   *
+   * Calling `mostRetweeted` on an empty set should throw an exception of
+   * type `java.util.NoSuchElementException`.
+   *
+   * Question: Should we implment this method here, or should it remain abstract
+   * and be implemented in the subclasses?
+   */
   def mostRetweeted: Tweet
 
   /**
@@ -136,7 +136,7 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
 
   def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = {
 
-    elem match{
+    elem match {
       case x if p(x) => right.filterAcc(p, acc.incl(x)).union(left.filterAcc(p, acc.incl(x)))
       case _ => right.filterAcc(p, acc).union(left.filterAcc(p, acc))
     }
@@ -161,29 +161,16 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
       case (first: NonEmpty, second: NonEmpty) => maxFromTwoTweets(elem, maxFromTwoTweets(second.mostRetweeted, first.mostRetweeted))
     }
   }
-    /*def viewingTweets ( tweetSet: TweetSet, mostRetweeted : Tweet ) : Tweet = {
-      tweetSet match {
-        case empty: Empty => mostRetweeted
-        case nonEmpty : NonEmpty =>
-          if (nonEmpty.elem.retweets > mostRetweeted.retweets)
-            viewingTweets(nonEmpty.right, nonEmpty.elem)
-          else
-            viewingTweets(nonEmpty.right, mostRetweeted)
-      //  case nonEmpty: NonEmpty if  nonEmpty.elem.retweets >= mostRetweeted.retweets => x :  viewingTweets(nonEmpty.right, nonEmpty.elem)
-        /*case nonEmpty: NonEmpty if nonEmpty.elem.retweets >= mostRetweeted.retweets => viewingTweets(nonEmpty.right, nonEmpty.elem)
-        case nonEmpty: NonEmpty if nonEmpty.elem.retweets < mostRetweeted.retweets => viewingTweets(nonEmpty.right, mostRetweeted)*/
-      }
-    }*/
-   // viewingTweets(right,elem)
 
   def descendingByRetweet: TweetList = {
 
-    def tailList (tweetSet: TweetSet): TweetList = {
+    def tailList(tweetSet: TweetSet): TweetList = {
       tweetSet match {
         case nonEmpty: NonEmpty => new Cons(tweetSet.mostRetweeted, tailList(tweetSet.remove(tweetSet.mostRetweeted)))
         case _ => Nil
       }
     }
+
     new Cons(this.mostRetweeted, tailList(this.remove(this.mostRetweeted)))
   }
 
@@ -217,8 +204,11 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
 
 trait TweetList {
   def head: Tweet
+
   def tail: TweetList
+
   def isEmpty: Boolean
+
   def foreach(f: Tweet => Unit): Unit =
     if (!isEmpty) {
       f(head)
@@ -228,7 +218,9 @@ trait TweetList {
 
 object Nil extends TweetList {
   def head = throw new java.util.NoSuchElementException("head of EmptyList")
+
   def tail = throw new java.util.NoSuchElementException("tail of EmptyList")
+
   def isEmpty = true
 }
 
@@ -241,15 +233,15 @@ object GoogleVsApple {
   val google = List("android", "Android", "galaxy", "Galaxy", "nexus", "Nexus")
   val apple = List("ios", "iOS", "iphone", "iPhone", "ipad", "iPad")
 
-  def SetBySearchWords(list: List[String], tweetSet: TweetSet) : TweetSet ={
+  def SetBySearchWords(list: List[String], tweetSet: TweetSet): TweetSet = {
     list match {
       case x if x.isEmpty => tweetSet
-      case _ =>  SetBySearchWords(list.tail, tweetSet.union(allTweets.filter(x => x.text.contains(list.head))))
+      case _ => SetBySearchWords(list.tail, tweetSet.union(allTweets.filter(x => x.text.contains(list.head))))
     }
   }
 
 
-  lazy val googleTweets: TweetSet =  SetBySearchWords(google, new Empty) //google.foreach(substring => allTweets.filter(x => x.text.contains(substring)))
+  lazy val googleTweets: TweetSet = SetBySearchWords(google, new Empty) //google.foreach(substring => allTweets.filter(x => x.text.contains(substring)))
   lazy val appleTweets: TweetSet = SetBySearchWords(apple, new Empty) //apple.foreach(x => ParseTweets.getTweets(_,x))
 
   /**

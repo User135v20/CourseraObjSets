@@ -1,4 +1,7 @@
-package objsets
+//package objsets
+
+import objsets.{Empty, Tweet, TweetSet, TweetData}
+
 
 class TweetSetSuite extends munit.FunSuite {
   trait TestSets {
@@ -72,7 +75,7 @@ class TweetSetSuite extends munit.FunSuite {
 
   test("most retweeted set4c") {
     new TestSets {
-      assertEquals(set4c.mostRetweeted.retweets, 27)
+      assertEquals(set4c.mostRetweeted.retweets, 20)
     }
   }
 
